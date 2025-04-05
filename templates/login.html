@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emovia - Вход</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>Emovia</h1>
+            <p>Отслеживайте ваше настроение</p>
+            
+            {% if error %}
+            <div class="error-message">{{ error }}</div>
+            {% endif %}
+            
+            <form action="/login" method="POST">
+                <input type="text" name="username" placeholder="Ваше имя" required>
+                <button type="submit">Войти</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

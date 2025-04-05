@@ -1,0 +1,372 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.app-container {
+    max-width: 400px;
+    margin: 0 auto;
+    background-color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+header {
+    padding: 15px;
+    text-align: center;
+    background-color: #6a5acd;
+    color: white;
+    position: relative;
+}
+
+.time-display {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.app-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+main {
+    flex: 1;
+    padding: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.screen {
+    display: none;
+    height: 100%;
+}
+
+.screen.active {
+    display: block;
+}
+
+.week-days {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    padding: 0 10px;
+}
+
+.week-days div {
+    text-align: center;
+    width: 14%;
+    font-weight: bold;
+}
+
+.mood-forecast {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.mood-forecast h3 {
+    font-weight: normal;
+    font-size: 18px;
+}
+
+.mark-mood-btn {
+    display: block;
+    width: 80%;
+    margin: 40px auto;
+    padding: 15px;
+    background-color: #6a5acd;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+footer {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0;
+    background-color: white;
+    border-top: 1px solid #eee;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #888;
+}
+
+.nav-btn.active svg {
+    fill: #6a5acd;
+}
+
+/* Articles Screen */
+.articles-list {
+    margin-top: 20px;
+}
+
+.article-item {
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.article-item h3 {
+    margin-bottom: 5px;
+}
+
+.article-item p {
+    color: #666;
+    font-size: 14px;
+}
+
+/* Calendar Screen */
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin: 20px 0;
+}
+
+.calendar-header {
+    text-align: center;
+    font-weight: bold;
+    padding: 5px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.calendar-day.empty {
+    visibility: hidden;
+}
+
+.calendar-day.today {
+    border: 2px solid #6a5acd;
+}
+
+.mood-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.color-sample {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.happy { background-color: #4CAF50; }
+.good { background-color: #8BC34A; }
+.neutral { background-color: #FFC107; }
+.bad { background-color: #FF9800; }
+.sad { background-color: #F44336; }
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 350px;
+}
+
+.mood-options {
+    margin: 20px 0;
+}
+
+.mood-option {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.mood-option:hover {
+    background-color: #f5f5f5;
+}
+
+.close-modal {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #6a5acd;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Login Page Styles */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #6a5acd;
+}
+
+.login-box {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-box h1 {
+    color: #6a5acd;
+    margin-bottom: 10px;
+}
+
+.login-box p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.login-box button {
+    width: 100%;
+    padding: 12px;
+    background-color: #6a5acd;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.error-message {
+    color: #f44336;
+    margin-bottom: 15px;
+}
+
+/* Mood Circle */
+.mood-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mood-circle.happy { background-color: #4CAF50; }
+.mood-circle.good { background-color: #8BC34A; }
+.mood-circle.neutral { background-color: #FFC107; }
+.mood-circle.bad { background-color: #FF9800; }
+.mood-circle.sad { background-color: #F44336; }
+
+.user-info {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.logout-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Article modal styles */
+.article-content {
+    margin: 20px 0;
+    line-height: 1.6;
+}
+
+/* Make sure modal content is scrollable */
+.modal-content {
+    max-height: 80vh;
+    overflow-y: auto;
+}
