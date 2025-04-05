@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import datetime, timedelta
+from werkzeug.security import generate_password_hash, check_password_hash
 
 def init_db():
     conn = sqlite3.connect('emovia.db')
@@ -7,9 +8,10 @@ def init_db():
     
     # Создаем таблицу пользователей
     c.execute('''CREATE TABLE IF NOT EXISTS users
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  username TEXT UNIQUE NOT NULL,
-                  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+             (id INTEGER PRIMARY KEY AUTOINCREMENT,
+              username TEXT UNIQUE NOT NULL,
+              password TEXT NOT NULL,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     
     # Создаем таблицу настроений
     c.execute('''CREATE TABLE IF NOT EXISTS moods
@@ -26,26 +28,48 @@ def init_db():
 def get_db_connection():
     return sqlite3.connect('emovia.db')
 
-def create_user(username):
+def create_user(username, password):
     conn = get_db_connection()
     c = conn.cursor()
     try:
-        c.execute("INSERT INTO users (username) VALUES (?)", (username,))
+        hashed_pw = generate_password_hash(password)
+        c.execute("INSERT INTO users (username, password) VALUES (?, ?)", 
+                 (username, hashed_pw))
         user_id = c.lastrowid
         conn.commit()
         return user_id
     except sqlite3.IntegrityError:
-        return None  # Пользователь уже существует
+        return None
     finally:
         conn.close()
 
-def get_user(username):
+def get_user(username, password=None):
     conn = get_db_connection()
     c = conn.cursor()
-    c.execute("SELECT id FROM users WHERE username = ?", (username,))
+    c.execute("SELECT id, password FROM users WHERE username = ?", (username,))
     user = c.fetchone()
     conn.close()
-    return user[0] if user else None
+    
+    if user and (password is None or check_password_hash(user[1], password)):
+        return user[0]  # Возвращаем только ID если пароль верный или не проверяется
+    return None
+
+def get_week_moods(user_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+    
+    # Получаем настроения за последние 7 дней
+    end_date = datetime.now().strftime('%Y-%m-%d')
+    start_date = (datetime.now() - timedelta(days=6)).strftime('%Y-%m-%d')
+    
+    c.execute('''SELECT date, mood FROM moods 
+                 WHERE user_id = ? AND date BETWEEN ? AND ?
+                 ORDER BY date''', (user_id, start_date, end_date))
+    moods = c.fetchall()
+    conn.close()
+    
+    # Создаем словарь для удобного доступа
+    return {m[0]: m[1] for m in moods}
 
 def record_mood(user_id, date, mood):
     conn = get_db_connection()

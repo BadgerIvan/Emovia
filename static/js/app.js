@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeArticleModal = document.getElementById('close-article-modal');
     const articleModalTitle = document.getElementById('article-modal-title');
     const articleModalContent = document.getElementById('article-modal-content');
+
     
     // Initialize
     updateTime();
@@ -36,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadArticles();
     generateCalendar();
     updateMoodForecast();
+    updateWeekDaysColors();
     
     // Navigation handlers
     articlesBtn.addEventListener('click', function() {
@@ -92,6 +94,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = '/login';
             });
     });
+
+    function updateWeekDaysColors() {
+        fetch('/api/mood/week')
+            .then(response => response.json())
+            .then(moods => {
+                const weekDays = document.querySelectorAll('.week-days div');
+                const daysOfWeek = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
+                const today = new Date();
+                
+                weekDays.forEach((dayElem, index) => {
+                    // Определяем дату для каждого дня недели
+                    const dayOffset = index - today.getDay() + 1;
+                    const date = new Date();
+                    date.setDate(today.getDate() + dayOffset);
+                    const dateStr = date.toISOString().split('T')[0];
+                    
+                    // Сбрасываем классы
+                    dayElem.className = '';
+                    
+                    // Добавляем класс настроения, если есть данные
+                    if (moods[dateStr]) {
+                        dayElem.classList.add(moods[dateStr]);
+                    }
+                    
+                    // Выделяем сегодняшний день
+                    if (dayOffset === 0) {
+                        dayElem.classList.add('today');
+                    }
+                });
+            });
+    }
     
     function setActiveScreen(screen) {
         // Reset all screens and buttons
@@ -247,6 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             updateMoodForecast();
             generateCalendar();
+            updateWeekDaysColors(); // Добавьте эту строку
         })
         .catch(error => {
             console.error('Error recording mood:', error);

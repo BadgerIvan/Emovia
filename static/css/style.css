@@ -370,3 +370,132 @@ footer {
     max-height: 80vh;
     overflow-y: auto;
 }
+
+.register-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.register-section h3 {
+    color: #6a5acd;
+    margin-bottom: 15px;
+}
+
+.week-days div {
+    text-align: center;
+    width: 14%;
+    font-weight: bold;
+    padding: 8px 0;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+/* Цвета для настроений */
+.week-days .happy {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.week-days .good {
+    background-color: #8BC34A;
+    color: white;
+}
+
+.week-days .neutral {
+    background-color: #FFC107;
+}
+
+.week-days .bad {
+    background-color: #FF9800;
+    color: white;
+}
+
+.week-days .sad {
+    background-color: #F44336;
+    color: white;
+}
+
+.week-days .today {
+    border: 2px solid #6a5acd;
+    box-sizing: border-box;
+}
+
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #6a5acd;
+    padding: 20px;
+}
+
+.auth-box {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+}
+
+.auth-box h1 {
+    color: #6a5acd;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.auth-box p {
+    color: #666;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.auth-box input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.auth-box button {
+    width: 100%;
+    padding: 12px;
+    background-color: #6a5acd;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.error-message {
+    color: #f44336;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+
+.auth-switch a {
+    color: #6a5acd;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+/* Скрываем форму регистрации по умолчанию */
+#register-box {
+    display: none;
+}

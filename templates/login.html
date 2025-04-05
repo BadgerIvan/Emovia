@@ -3,24 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emovia - Вход</title>
+    <title>Emovia - Вход и регистрация</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-box">
+    <div class="auth-container">
+        <!-- Форма входа -->
+        <div class="auth-box" id="login-box">
             <h1>Emovia</h1>
             <p>Отслеживайте ваше настроение</p>
             
-            {% if error %}
+            {% if error and not show_register %}
             <div class="error-message">{{ error }}</div>
             {% endif %}
             
             <form action="/login" method="POST">
-                <input type="text" name="username" placeholder="Ваше имя" required>
+                <input type="text" name="username" placeholder="Имя пользователя" required>
+                <input type="password" name="password" placeholder="Пароль" required>
                 <button type="submit">Войти</button>
             </form>
+            
+            <div class="auth-switch">
+                Нет аккаунта? <a href="#" onclick="showAuthForm('register')">Зарегистрируйтесь</a>
+            </div>
+        </div>
+        
+        <!-- Форма регистрации -->
+        <div class="auth-box" id="register-box">
+            <h1>Регистрация</h1>
+            <p>Создайте новый аккаунт</p>
+            
+            {% if error and show_register %}
+            <div class="error-message">{{ error }}</div>
+            {% endif %}
+            
+            <form action="/register" method="POST">
+                <input type="text" name="username" placeholder="Имя пользователя" required>
+                <input type="password" name="password" placeholder="Пароль" required>
+                <input type="password" name="confirm_password" placeholder="Подтвердите пароль" required>
+                <button type="submit">Зарегистрироваться</button>
+            </form>
+            
+            <div class="auth-switch">
+                Уже есть аккаунт? <a href="#" onclick="showAuthForm('login')">Войдите</a>
+            </div>
         </div>
     </div>
+
+    <script>
+        function showAuthForm(formType) {
+            if (formType === 'login') {
+                document.getElementById('login-box').style.display = 'block';
+                document.getElementById('register-box').style.display = 'none';
+            } else {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('register-box').style.display = 'block';
+            }
+            // Прокрутка к верху формы
+            window.scrollTo(0, 0);
+        }
+        
+        // Показываем форму регистрации если есть параметр show_register
+        {% if show_register %}
+        showAuthForm('register');
+        {% endif %}
+    </script>
 </body>
 </html>

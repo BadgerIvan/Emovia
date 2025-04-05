@@ -1,6 +1,8 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for, session
 from datetime import datetime, timedelta
 import database
+from werkzeug.security import generate_password_hash, check_password_hash
+import re
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # В продакшене используйте настоящий секретный ключ
@@ -18,16 +20,60 @@ def index():
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
-        if username:
-            user_id = database.get_user(username)
-            if not user_id:
-                user_id = database.create_user(username)
-            if user_id:
-                session['user_id'] = user_id
-                session['username'] = username
-                return redirect(url_for('index'))
-        return render_template('login.html', error="Неверное имя пользователя")
-    return render_template('login.html')
+        password = request.form.get('password')
+        
+        if not username or not password:
+            return render_template('login.html', error="Заполните все поля")
+        
+        user_id = database.get_user(username, password)
+        if user_id:
+            session['user_id'] = user_id
+            session['username'] = username
+            return redirect(url_for('index'))
+        
+        return render_template('login.html', error="Неверное имя пользователя или пароль")
+    
+    return render_template('login.html', show_register=request.args.get('register'))
+
+def is_password_strong(password):
+    if len(password) < 8:
+        return False
+    if not re.search("[a-z]", password):
+        return False
+    if not re.search("[A-Z]", password):
+        return False
+    if not re.search("[0-9]", password):
+        return False
+    return True
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if not username or not password:
+            return render_template('login.html', error="Заполните все поля", show_register=True)
+        
+        if password != confirm_password:
+            return render_template('login.html', error="Пароли не совпадают", show_register=True)
+        
+        if database.get_user(username):
+            return render_template('login.html', error="Пользователь уже существует", show_register=True)
+        
+        if not is_password_strong(password):
+            return render_template('login.html', error="Пароль должен содержать минимум 8 символов, включая заглавные буквы и цифры")
+        
+        user_id = database.create_user(username, password)
+        if user_id:
+            session['user_id'] = user_id
+            session['username'] = username
+            return redirect(url_for('index'))
+        
+        return render_template('login.html', error="Ошибка регистрации", show_register=True)
+    
+    return redirect(url_for('login', register=True))
 
 @app.route('/api/user')
 def get_user_info():
@@ -38,6 +84,14 @@ def get_user_info():
         "username": session['username']
     })
 
+@app.route('/api/mood/week')
+def get_week_moods():
+    if 'user_id' not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    moods = database.get_week_moods(session['user_id'])
+    return jsonify(moods)
+    
 @app.route('/api/mood', methods=['POST'])
 def record_mood():
     if 'user_id' not in session:
