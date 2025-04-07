@@ -559,3 +559,64 @@ footer {
     border-radius: 5px;
     resize: vertical;
 }
+
+.chart-container {
+    margin: 20px 0;
+    height: 300px;
+}
+
+.stats-summary {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+}
+
+.stats-item {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.stats-label {
+    width: 100px;
+    font-weight: bold;
+}
+
+.stats-bar {
+    flex: 1;
+    height: 20px;
+    background-color: #eee;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.stats-fill {
+    height: 100%;
+    border-radius: 10px;
+}
+
+.happy .stats-fill { background-color: #4CAF50; }
+.good .stats-fill { background-color: #8BC34A; }
+.neutral .stats-fill { background-color: #FFC107; }
+.bad .stats-fill { background-color: #FF9800; }
+.sad .stats-fill { background-color: #F44336; }
+
+.stats-value {
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+.daily-quote {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    font-style: italic;
+    text-align: center;
+}
+
+.daily-quote p {
+    margin: 0;
+}

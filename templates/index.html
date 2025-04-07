@@ -37,6 +37,9 @@
                     <h3>Прогноз на сегодня: <span id="today-forecast">Загрузка...</span></h3>
                 </div>
                 <button class="mark-mood-btn" id="mark-mood-btn">Отметить своё состояние</button>
+                <div class="daily-quote">
+                    <p id="daily-quote-text">Загрузка цитаты...</p>
+                </div>
             </div>
             <div class="screen" id="calendar-screen">
                 <h2>Календарь настроения</h2>
@@ -50,8 +53,13 @@
                     <div class="legend-item"><span class="color-sample sad"></span> Грусть</div>
                 </div>
             </div>
+            <div class="screen" id="stats-screen">
+                <h2>Статистика настроения</h2>
+                <div class="chart-container">
+                    <canvas id="mood-chart"></canvas>
+                </div>
+            </div>
         </main>
-
         <footer>
             <button class="nav-btn" id="articles-btn">
                 <svg viewBox="0 0 24 24">
@@ -67,6 +75,11 @@
             <button class="nav-btn" id="calendar-btn">
                 <svg viewBox="0 0 24 24">
                     <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/>
+                </svg>
+            </button>
+            <button class="nav-btn" id="stats-btn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
                 </svg>
             </button>
         </footer>
@@ -102,6 +115,7 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/js/app.js"></script>
 </body>
 </html>

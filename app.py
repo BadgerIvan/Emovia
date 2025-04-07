@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import database
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
+import random
 
 app = Flask(__name__)
 
@@ -214,6 +215,62 @@ def delete_note(note_id):
     
     success = database.delete_note(note_id, session['user_id'])
     return jsonify({"status": "success" if success else "note not found"})
+
+@app.route('/api/mood/stats')
+def get_mood_stats():
+    if 'user_id' not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    moods = database.get_moods(session['user_id'], days=30)
+    
+    stats = {
+        'happy': 0,
+        'good': 0,
+        'neutral': 0,
+        'bad': 0,
+        'sad': 0
+    }
+    
+    for date, mood in moods:
+        if mood in stats:
+            stats[mood] += 1
+    
+    return jsonify(stats)
+
+QUOTES = {
+    'happy': [
+        "Счастье - это не что-то готовое. Оно зависит от ваших действий.",
+        "Счастлив не тот, у кого все есть, а тот, кто умеет радоваться тому, что имеет."
+    ],
+    'good': [
+        "Каждый день может быть хорошим, если правильно его начать.",
+        "Хорошее настроение - это половина успеха."
+    ],
+    'neutral': [
+        "Иногда нейтральное состояние - это просто передышка перед новыми свершениями.",
+        "Спокойствие - это тоже результат."
+    ],
+    'bad': [
+        "Даже в плохой день помни: завтра будет лучше.",
+        "Трудности временны, но опыт, который они дают, останется с тобой навсегда."
+    ],
+    'sad': [
+        "Грусть - это просто облако, которое закрывает солнце. Оно обязательно пройдет.",
+        "Позволь себе погрустить, но не забывай, что впереди много хорошего."
+    ]
+}
+
+@app.route('/api/quote')
+def get_quote():
+    if 'user_id' not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    forecast = request.args.get('forecast')
+    if not forecast or forecast not in QUOTES:
+        forecast = 'neutral'
+    
+    quote = random.choice(QUOTES[forecast])
+    return jsonify({"quote": quote, "forecast": forecast})
 
 if __name__ == '__main__':
     app.run(debug=True)

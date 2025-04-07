@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const notesList = document.getElementById('notes-list');
     const newNote = document.getElementById('new-note');
     const addNoteBtn = document.getElementById('add-note-btn');
+
+    const statsBtn = document.getElementById('stats-btn');
+    const statsScreen = document.getElementById('stats-screen');
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded');
+    }
     
     updateTime();
     setInterval(updateTime, 60000);
@@ -124,10 +130,12 @@ document.addEventListener('DOMContentLoaded', function() {
         articlesScreen.classList.remove('active');
         mainScreen.classList.remove('active');
         calendarScreen.classList.remove('active');
+        statsScreen.classList.remove('active');
+        statsBtn.classList.remove('active');
         articlesBtn.classList.remove('active');
         homeBtn.classList.remove('active');
         calendarBtn.classList.remove('active');
-        
+
         if (screen === 'articles') {
             articlesScreen.classList.add('active');
             articlesBtn.classList.add('active');
@@ -137,6 +145,10 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (screen === 'calendar') {
             calendarScreen.classList.add('active');
             calendarBtn.classList.add('active');
+        } else if (screen === 'stats') {
+            statsScreen.classList.add('active');
+            statsBtn.classList.add('active');
+            updateStats();
         }
     }
     
@@ -291,6 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     moodCircle.className = `mood-circle ${data.forecast}`;
                     moodCircle.textContent = data.message;
                 }
+                updateDailyQuote(data.forecast);
             });
     }
 
@@ -380,4 +393,101 @@ document.addEventListener('DOMContentLoaded', function() {
     closeNotesModal.addEventListener('click', function() {
         notesModal.classList.remove('active');
     });
+    
+    statsBtn.addEventListener('click', function() {
+        setActiveScreen('stats');
+    });
+
+    function updateStats() {
+        fetch('/api/mood/stats')
+            .then(response => response.json())
+            .then(stats => {
+                const ctx = document.getElementById('mood-chart');
+                
+                if (!ctx) {
+                    console.error('Canvas element not found');
+                    return;
+                }
+                
+                if (window.moodChart instanceof Chart) {
+                    window.moodChart.destroy();
+                }
+                
+                if (typeof Chart === 'undefined') {
+                    console.error('Chart.js is not available');
+                    return;
+                }
+                
+                try {
+                    window.moodChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Счастлив', 'Хорошее', 'Нейтральное', 'Плохое', 'Грусть'],
+                            datasets: [{
+                                data: [
+                                    stats.happy || 0,
+                                    stats.good || 0,
+                                    stats.neutral || 0,
+                                    stats.bad || 0,
+                                    stats.sad || 0
+                                ],
+                                backgroundColor: [
+                                    '#4CAF50',
+                                    '#8BC34A',
+                                    '#FFC107',
+                                    '#FF9800',
+                                    '#F44336'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error creating chart:', e);
+                }
+                
+                updateTextStats(stats);
+            })
+            .catch(error => {
+                console.error('Error fetching stats:', error);
+            });
+    }
+    
+    function updateTextStats(stats) {
+        const total = Object.values(stats).reduce((a, b) => a + b, 0);
+        const summary = document.getElementById('stats-summary');
+        
+        if (!summary) {
+            console.error('Stats summary element not found');
+            return;
+        }
+        
+        summary.innerHTML = '';
+        
+        for (const [mood, count] of Object.entries(stats)) {
+            const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+            
+            const item = document.createElement('div');
+            item.className = `stats-item ${mood}`;
+            item.innerHTML = `
+                <div class="stats-label">${getMoodLabel(mood)}</div>
+                <div class="stats-bar">
+                    <div class="stats-fill" style="width: ${percentage}%"></div>
+                </div>
+                <div class="stats-value">${percentage}%</div>
+            `;
+            summary.appendChild(item);
+        }
+    }
+
+    function updateDailyQuote(forecast = 'neutral') {
+        fetch(`/api/quote?forecast=${forecast}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('daily-quote-text').textContent = data.quote;
+            });
+    }
 });
