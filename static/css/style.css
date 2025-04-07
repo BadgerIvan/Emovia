@@ -561,7 +561,10 @@ footer {
 }
 
 .chart-container {
-    margin: 20px 0;
+    position: relative;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 300px;
     height: 300px;
 }
 
@@ -619,4 +622,9 @@ footer {
 
 .daily-quote p {
     margin: 0;
+}
+
+#mood-chart {
+    width: 100% !important;
+    height: 100% !important;
 }

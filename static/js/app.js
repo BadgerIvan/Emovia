@@ -404,51 +404,57 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(stats => {
                 const ctx = document.getElementById('mood-chart');
                 
-                if (!ctx) {
-                    console.error('Canvas element not found');
-                    return;
-                }
-                
-                if (window.moodChart instanceof Chart) {
+                // Удаляем предыдущий график, если он есть
+                if (window.moodChart) {
                     window.moodChart.destroy();
                 }
-                
-                if (typeof Chart === 'undefined') {
-                    console.error('Chart.js is not available');
-                    return;
+    
+                // Проверяем, что все данные есть
+                const dataValues = [
+                    stats.happy || 0,
+                    stats.good || 0,
+                    stats.neutral || 0,
+                    stats.bad || 0,
+                    stats.sad || 0
+                ];
+    
+                // Если все нули, добавляем небольшое значение для отображения
+                if (dataValues.every(v => v === 0)) {
+                    dataValues[2] = 0.1; // neutral
                 }
-                
-                try {
-                    window.moodChart = new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: ['Счастлив', 'Хорошее', 'Нейтральное', 'Плохое', 'Грусть'],
-                            datasets: [{
-                                data: [
-                                    stats.happy || 0,
-                                    stats.good || 0,
-                                    stats.neutral || 0,
-                                    stats.bad || 0,
-                                    stats.sad || 0
-                                ],
-                                backgroundColor: [
-                                    '#4CAF50',
-                                    '#8BC34A',
-                                    '#FFC107',
-                                    '#FF9800',
-                                    '#F44336'
-                                ]
-                            }]
+    
+                window.moodChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Счастлив', 'Хорошее', 'Нейтральное', 'Плохое', 'Грусть'],
+                        datasets: [{
+                            data: dataValues,
+                            backgroundColor: [
+                                '#4CAF50',
+                                '#8BC34A',
+                                '#FFC107',
+                                '#FF9800',
+                                '#F44336'
+                            ],
+                            borderWidth: 0 // Убираем границы
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%', // Центральное отверстие
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
                         },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false
+                        animation: {
+                            animateScale: true,
+                            animateRotate: true
                         }
-                    });
-                } catch (e) {
-                    console.error('Error creating chart:', e);
-                }
-                
+                    }
+                });
+    
                 updateTextStats(stats);
             })
             .catch(error => {
@@ -490,4 +496,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('daily-quote-text').textContent = data.quote;
             });
     }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/js/service-worker.js')
+            .then(registration => {
+            console.log('ServiceWorker registration successful');
+            })
+            .catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
+
 });
