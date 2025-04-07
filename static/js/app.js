@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем авторизацию
     checkAuth();
     
-    // Navigation
     const articlesBtn = document.getElementById('articles-btn');
     const homeBtn = document.getElementById('home-btn');
     const calendarBtn = document.getElementById('calendar-btn');
@@ -10,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainScreen = document.getElementById('main-screen');
     const calendarScreen = document.getElementById('calendar-screen');
     
-    // Mood tracking
     const markMoodBtn = document.getElementById('mark-mood-btn');
     const moodModal = document.getElementById('mood-modal');
     const closeModal = document.getElementById('close-modal');
@@ -18,20 +15,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const todayForecast = document.getElementById('today-forecast');
     const moodCircle = document.getElementById('mood-circle');
     
-    // Time display
     const currentTime = document.getElementById('current-time');
 
     const usernameDisplay = document.getElementById('username-display');
     const logoutBtn = document.getElementById('logout-btn');
 
-    // Добавим обработчики для статей
     const articleModal = document.getElementById('article-modal');
     const closeArticleModal = document.getElementById('close-article-modal');
     const articleModalTitle = document.getElementById('article-modal-title');
     const articleModalContent = document.getElementById('article-modal-content');
 
+    const notesModal = document.getElementById('notes-modal');
+    const closeNotesModal = document.getElementById('close-notes-modal');
+    const notesDate = document.getElementById('notes-date');
+    const notesList = document.getElementById('notes-list');
+    const newNote = document.getElementById('new-note');
+    const addNoteBtn = document.getElementById('add-note-btn');
     
-    // Initialize
     updateTime();
     setInterval(updateTime, 60000);
     loadArticles();
@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
     updateMoodForecast();
     updateWeekDaysColors();
     
-    // Navigation handlers
     articlesBtn.addEventListener('click', function() {
         setActiveScreen('articles');
     });
@@ -54,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function() {
         generateCalendar();
     });
     
-    // Mood tracking handlers
     markMoodBtn.addEventListener('click', function() {
         moodModal.classList.add('active');
     });
@@ -104,21 +102,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const today = new Date();
                 
                 weekDays.forEach((dayElem, index) => {
-                    // Определяем дату для каждого дня недели
                     const dayOffset = index - today.getDay() + 1;
                     const date = new Date();
                     date.setDate(today.getDate() + dayOffset);
                     const dateStr = date.toISOString().split('T')[0];
                     
-                    // Сбрасываем классы
                     dayElem.className = '';
                     
-                    // Добавляем класс настроения, если есть данные
                     if (moods[dateStr]) {
                         dayElem.classList.add(moods[dateStr]);
                     }
                     
-                    // Выделяем сегодняшний день
                     if (dayOffset === 0) {
                         dayElem.classList.add('today');
                     }
@@ -127,7 +121,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function setActiveScreen(screen) {
-        // Reset all screens and buttons
         articlesScreen.classList.remove('active');
         mainScreen.classList.remove('active');
         calendarScreen.classList.remove('active');
@@ -135,7 +128,6 @@ document.addEventListener('DOMContentLoaded', function() {
         homeBtn.classList.remove('active');
         calendarBtn.classList.remove('active');
         
-        // Activate selected screen and button
         if (screen === 'articles') {
             articlesScreen.classList.add('active');
             articlesBtn.classList.add('active');
@@ -185,7 +177,6 @@ document.addEventListener('DOMContentLoaded', function() {
         articleModal.classList.add('active');
     }
     
-    // Добавим обработчик закрытия модального окна статьи
     closeArticleModal.addEventListener('click', function() {
         articleModal.classList.remove('active');
     });
@@ -205,7 +196,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const calendar = document.getElementById('calendar');
                 calendar.innerHTML = '';
                 
-                // Add day headers
                 ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].forEach(day => {
                     const header = document.createElement('div');
                     header.className = 'calendar-header';
@@ -213,14 +203,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     calendar.appendChild(header);
                 });
                 
-                // Add empty cells for days before the first day of the month
                 for (let i = 0; i < (firstDay === 0 ? 6 : firstDay - 1); i++) {
                     const empty = document.createElement('div');
                     empty.className = 'calendar-day empty';
                     calendar.appendChild(empty);
                 }
                 
-                // Create a map of dates to moods for quick lookup
                 const moodMap = {};
                 moods.forEach(m => {
                     const date = new Date(m.date);
@@ -229,7 +217,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
                 
-                // Add days of the month
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dayElement = document.createElement('div');
                     dayElement.className = 'calendar-day';
@@ -280,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             updateMoodForecast();
             generateCalendar();
-            updateWeekDaysColors(); // Добавьте эту строку
+            updateWeekDaysColors(); 
         })
         .catch(error => {
             console.error('Error recording mood:', error);
@@ -293,20 +280,104 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 todayForecast.textContent = data.message;
                 
-                // Update mood circle
                 const moodCircle = document.getElementById('mood-circle');
                 if (!moodCircle) {
-                    // Create mood circle if it doesn't exist
                     const circle = document.createElement('div');
                     circle.id = 'mood-circle';
                     circle.className = `mood-circle ${data.forecast}`;
                     circle.textContent = data.message;
                     document.querySelector('.mood-forecast').prepend(circle);
                 } else {
-                    // Update existing circle
                     moodCircle.className = `mood-circle ${data.forecast}`;
                     moodCircle.textContent = data.message;
                 }
             });
     }
+
+    function showNotesForDate(day, month, year) {
+        const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const formattedDate = `${day}.${month}.${year}`;
+        
+        notesDate.textContent = formattedDate;
+        newNote.value = '';
+        
+        fetch(`/api/notes?date=${dateStr}`)
+            .then(response => response.json())
+            .then(notes => {
+                notesList.innerHTML = '';
+                
+                if (notes.length === 0) {
+                    notesList.innerHTML = '<p>Нет заметок на эту дату</p>';
+                    return;
+                }
+                
+                notes.forEach(note => {
+                    const noteElement = document.createElement('div');
+                    noteElement.className = 'note-item';
+                    noteElement.innerHTML = `
+                        <div class="note-date">${new Date(note.date).toLocaleDateString()}</div>
+                        <div class="note-content">${note.content}</div>
+                        <button class="delete-note" data-id="${note.id}">×</button>
+                    `;
+                    notesList.appendChild(noteElement);
+                });
+                
+                document.querySelectorAll('.delete-note').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const noteId = this.getAttribute('data-id');
+                        deleteNote(noteId);
+                    });
+                });
+            });
+        
+        notesModal.classList.add('active');
+    }
+    
+    function deleteNote(noteId) {
+        fetch(`/api/notes/${noteId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const currentDate = notesDate.textContent.split('.');
+                showNotesForDate(currentDate[0], currentDate[1], currentDate[2]);
+            }
+        });
+    }
+    
+    function showDayDetails(day, month, year, mood) {
+        showNotesForDate(day, month, year);
+    }
+    
+    addNoteBtn.addEventListener('click', function() {
+        const currentDate = notesDate.textContent.split('.');
+        const dateStr = `${currentDate[2]}-${String(currentDate[1]).padStart(2, '0')}-${String(currentDate[0]).padStart(2, '0')}`;
+        
+        if (newNote.value.trim() === '') {
+            alert('Заметка не может быть пустой');
+            return;
+        }
+        
+        fetch('/api/notes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                date: dateStr,
+                content: newNote.value.trim()
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            newNote.value = '';
+            showNotesForDate(currentDate[0], currentDate[1], currentDate[2]);
+        });
+    });
+    
+    closeNotesModal.addEventListener('click', function() {
+        notesModal.classList.remove('active');
+    });
 });

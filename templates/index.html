@@ -17,15 +17,11 @@
             </div>
         </header>
         <main>
-            <!-- Articles Screen -->
             <div class="screen" id="articles-screen">
                 <h2>Статьи</h2>
                 <div class="articles-list" id="articles-list">
-                    <!-- Articles will be loaded here -->
                 </div>
             </div>
-
-            <!-- Main Screen -->
             <div class="screen active" id="main-screen">
                 <div class="week-days">
                     <div>ПН</div>
@@ -36,19 +32,15 @@
                     <div>СБ</div>
                     <div>ВС</div>
                 </div>
-                <!-- В разделе main-screen, после week-days и перед mood-forecast добавьте: -->
                     <div class="mood-forecast">
                     <div id="mood-circle" class="mood-circle neutral">Загрузка...</div>
                     <h3>Прогноз на сегодня: <span id="today-forecast">Загрузка...</span></h3>
                 </div>
                 <button class="mark-mood-btn" id="mark-mood-btn">Отметить своё состояние</button>
             </div>
-
-            <!-- Calendar Screen -->
             <div class="screen" id="calendar-screen">
                 <h2>Календарь настроения</h2>
                 <div class="calendar" id="calendar">
-                    <!-- Calendar will be generated here -->
                 </div>
                 <div class="mood-legend">
                     <div class="legend-item"><span class="color-sample happy"></span> Радость</div>
@@ -78,8 +70,6 @@
                 </svg>
             </button>
         </footer>
-
-        <!-- Mood Selection Modal -->
         <div class="modal" id="mood-modal">
             <div class="modal-content">
                 <h3>Как вы себя чувствуете сегодня?</h3>
@@ -100,8 +90,18 @@
                 <button class="close-modal" id="close-article-modal">Закрыть</button>
             </div>
         </div>
+        <div class="modal" id="notes-modal">
+            <div class="modal-content">
+                <h3>Заметки на <span id="notes-date"></span></h3>
+                <div id="notes-list" class="notes-list"></div>
+                <textarea id="new-note" placeholder="Добавьте новую заметку..." rows="3"></textarea>
+                <div class="modal-buttons">
+                    <button id="add-note-btn" class="modal-button">Добавить</button>
+                    <button id="close-notes-modal" class="modal-button secondary">Закрыть</button>
+                </div>
+            </div>
+        </div>
     </div>
-
     <script src="/static/js/app.js"></script>
 </body>
 </html>

@@ -6,14 +6,12 @@ def init_db():
     conn = sqlite3.connect('emovia.db')
     c = conn.cursor()
     
-    # Создаем таблицу пользователей
     c.execute('''CREATE TABLE IF NOT EXISTS users
              (id INTEGER PRIMARY KEY AUTOINCREMENT,
               username TEXT UNIQUE NOT NULL,
               password TEXT NOT NULL,
               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     
-    # Создаем таблицу настроений
     c.execute('''CREATE TABLE IF NOT EXISTS moods
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id INTEGER NOT NULL,
@@ -21,6 +19,13 @@ def init_db():
                   mood TEXT NOT NULL,
                   FOREIGN KEY(user_id) REFERENCES users(id),
                   UNIQUE(user_id, date))''')
+    
+    c.execute('''CREATE TABLE IF NOT EXISTS notes
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id INTEGER NOT NULL,
+                  date DATE NOT NULL,
+                  content TEXT NOT NULL,
+                  FOREIGN KEY(user_id) REFERENCES users(id))''')
     
     conn.commit()
     conn.close()
@@ -51,14 +56,13 @@ def get_user(username, password=None):
     conn.close()
     
     if user and (password is None or check_password_hash(user[1], password)):
-        return user[0]  # Возвращаем только ID если пароль верный или не проверяется
+        return user[0]  
     return None
 
 def get_week_moods(user_id):
     conn = get_db_connection()
     c = conn.cursor()
     
-    # Получаем настроения за последние 7 дней
     end_date = datetime.now().strftime('%Y-%m-%d')
     start_date = (datetime.now() - timedelta(days=6)).strftime('%Y-%m-%d')
     
@@ -68,13 +72,11 @@ def get_week_moods(user_id):
     moods = c.fetchall()
     conn.close()
     
-    # Создаем словарь для удобного доступа
     return {m[0]: m[1] for m in moods}
 
 def record_mood(user_id, date, mood):
     conn = get_db_connection()
     c = conn.cursor()
-    # Вставляем или обновляем запись о настроении
     c.execute('''INSERT OR REPLACE INTO moods (user_id, date, mood)
                  VALUES (?, ?, ?)''', (user_id, date, mood))
     conn.commit()
@@ -102,3 +104,37 @@ def get_today_mood(user_id):
     mood = c.fetchone()
     conn.close()
     return mood[0] if mood else None
+
+def create_note(user_id, date, content):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("INSERT INTO notes (user_id, date, content) VALUES (?, ?, ?)",
+             (user_id, date, content))
+    conn.commit()
+    note_id = c.lastrowid
+    conn.close()
+    return note_id
+
+def get_notes(user_id, date=None):
+    conn = get_db_connection()
+    c = conn.cursor()
+    
+    if date:
+        c.execute("SELECT id, date, content FROM notes WHERE user_id = ? AND date = ? ORDER BY date DESC", 
+                 (user_id, date))
+    else:
+        c.execute("SELECT id, date, content FROM notes WHERE user_id = ? ORDER BY date DESC", 
+                 (user_id,))
+    
+    notes = c.fetchall()
+    conn.close()
+    return [{"id": n[0], "date": n[1], "content": n[2]} for n in notes]
+
+def delete_note(note_id, user_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("DELETE FROM notes WHERE id = ? AND user_id = ?", (note_id, user_id))
+    conn.commit()
+    affected_rows = c.rowcount
+    conn.close()
+    return affected_rows > 0

@@ -189,5 +189,31 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
     
+@app.route('/api/notes', methods=['GET', 'POST'])
+def notes():
+    if 'user_id' not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    if request.method == 'POST':
+        data = request.get_json()
+        if not data or 'content' not in data:
+            return jsonify({"error": "Missing content"}), 400
+        
+        date = data.get('date', datetime.now().strftime('%Y-%m-%d'))
+        note_id = database.create_note(session['user_id'], date, data['content'])
+        return jsonify({"status": "success", "note_id": note_id})
+    
+    date = request.args.get('date')
+    notes = database.get_notes(session['user_id'], date)
+    return jsonify(notes)
+
+@app.route('/api/notes/<int:note_id>', methods=['DELETE'])
+def delete_note(note_id):
+    if 'user_id' not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    success = database.delete_note(note_id, session['user_id'])
+    return jsonify({"status": "success" if success else "note not found"})
+
 if __name__ == '__main__':
     app.run(debug=True)

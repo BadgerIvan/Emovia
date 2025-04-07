@@ -495,7 +495,67 @@ footer {
     text-decoration: underline;
 }
 
-/* Скрываем форму регистрации по умолчанию */
 #register-box {
     display: none;
+}
+
+.notes-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.note-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    position: relative;
+}
+
+.note-date {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.note-content {
+    white-space: pre-wrap;
+}
+
+.delete-note {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    color: #f44336;
+    cursor: pointer;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.modal-button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal-button.secondary {
+    background-color: #ddd;
+    color: #333;
+}
+
+#new-note {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: vertical;
 }
