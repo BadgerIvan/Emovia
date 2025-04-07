@@ -398,95 +398,68 @@ document.addEventListener('DOMContentLoaded', function() {
         setActiveScreen('stats');
     });
 
+    function getMoodLabel(mood) {
+        const moodLabels = {
+            'happy': 'Счастлив',
+            'good': 'Хорошее',
+            'neutral': 'Нейтральное',
+            'bad': 'Плохое',
+            'sad': 'Грусть'
+        };
+        return moodLabels[mood] || mood;
+    }
+
     function updateStats() {
         fetch('/api/mood/stats')
             .then(response => response.json())
             .then(stats => {
                 const ctx = document.getElementById('mood-chart');
-                
-                // Удаляем предыдущий график, если он есть
+            
                 if (window.moodChart) {
                     window.moodChart.destroy();
                 }
-    
-                // Проверяем, что все данные есть
-                const dataValues = [
-                    stats.happy || 0,
-                    stats.good || 0,
-                    stats.neutral || 0,
-                    stats.bad || 0,
-                    stats.sad || 0
+
+                const moodData = [
+                    { mood: 'happy', value: stats.happy || 0, color: '#4CAF50' },
+                    { mood: 'good', value: stats.good || 0, color: '#8BC34A' },
+                    { mood: 'neutral', value: stats.neutral || 0, color: '#FFC107' },
+                    { mood: 'bad', value: stats.bad || 0, color: '#FF9800' },
+                    { mood: 'sad', value: stats.sad || 0, color: '#F44336' }
                 ];
-    
-                // Если все нули, добавляем небольшое значение для отображения
-                if (dataValues.every(v => v === 0)) {
-                    dataValues[2] = 0.1; // neutral
+
+                if (moodData.every(item => item.value === 0)) {
+                    moodData.find(item => item.mood === 'neutral').value = 0.1;
                 }
-    
+
                 window.moodChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Счастлив', 'Хорошее', 'Нейтральное', 'Плохое', 'Грусть'],
+                        labels: moodData.map(item => getMoodLabel(item.mood)),
                         datasets: [{
-                            data: dataValues,
-                            backgroundColor: [
-                                '#4CAF50',
-                                '#8BC34A',
-                                '#FFC107',
-                                '#FF9800',
-                                '#F44336'
-                            ],
-                            borderWidth: 0 // Убираем границы
+                            data: moodData.map(item => item.value),
+                            backgroundColor: moodData.map(item => item.color),
+                            borderWidth: 0
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        cutout: '70%', // Центральное отверстие
+                        cutout: '70%',
                         plugins: {
                             legend: {
-                                position: 'bottom'
+                                position: 'bottom',
+                                labels: {
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
                             }
-                        },
-                        animation: {
-                            animateScale: true,
-                            animateRotate: true
                         }
                     }
-                });
-    
-                updateTextStats(stats);
-            })
-            .catch(error => {
-                console.error('Error fetching stats:', error);
             });
-    }
-    
-    function updateTextStats(stats) {
-        const total = Object.values(stats).reduce((a, b) => a + b, 0);
-        const summary = document.getElementById('stats-summary');
-        
-        if (!summary) {
-            console.error('Stats summary element not found');
-            return;
-        }
-        
-        summary.innerHTML = '';
-        
-        for (const [mood, count] of Object.entries(stats)) {
-            const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
-            
-            const item = document.createElement('div');
-            item.className = `stats-item ${mood}`;
-            item.innerHTML = `
-                <div class="stats-label">${getMoodLabel(mood)}</div>
-                <div class="stats-bar">
-                    <div class="stats-fill" style="width: ${percentage}%"></div>
-                </div>
-                <div class="stats-value">${percentage}%</div>
-            `;
-            summary.appendChild(item);
-        }
+        })
+        .catch(error => {
+            console.error('Error fetching stats:', error);
+        });
     }
 
     function updateDailyQuote(forecast = 'neutral') {
